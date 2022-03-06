@@ -42,6 +42,6 @@ while running:
     sc.fill(bg_color)
     drawing(sc, ball, WIDTH, newxy, line.cord, tail)
     if ball.y > HEIGHT + 50:
-        sc.blit(font.render('press R to restert', 1, '#58FF8D'), (100, 100))
+        sc.blit(font.render('press R to restart', 1, '#58FF8D'), (100, 100))
     pg.display.flip()
     clock.tick(60)
