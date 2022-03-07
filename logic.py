@@ -4,7 +4,7 @@ import random
 
 pg.init()
 
-g = 0.2
+g = 0.5
 ball_radius = 20
 ball_color = '#D25EFF'
 ball_shadow ='#734884'
@@ -14,6 +14,7 @@ newline_color = '#2E7F7D'
 linebord_color = '#00C3CD'
 
 parc_group = pg.sprite.Group()
+tail_group = pg.sprite.Group()
 
 def get_offset(x, width):
     return width / 2 - x
@@ -23,8 +24,8 @@ def offseted(dx, cord):
 
 def drawing(sc, ball, width, newxy, linepos, tail):
     dx = get_offset(ball.x, width)
-    for el in tail: # drawing tail of ball
-        pg.draw.rect(sc, el.color, (el.x - el.size + dx, el.y - el.size, el.size * 2, el.size * 2))
+    for el in tail_group: # drawing tail of ball
+        pg.draw.circle(sc, tuple(el.color), (el.x + dx, el.y), el.r)
 
     #drawing parc
     for el in parc_group:
@@ -76,12 +77,19 @@ class Ball(pg.sprite.Sprite):
                 draw_parc(self.x, self.y, sc)
 
 
-class Tailparticle():
+class Tailparticle(pg.sprite.Sprite):
     def __init__(self, x, y):
-        self.size = random.randint(1, 4)
-        self.x = random.randint(x - ball_radius + 5, x + ball_radius - 5)
-        self.y = random.randint(y - ball_radius + 5, y + ball_radius - 5)
-        self.color = random.choice(('#00D1F6', '#00B3D2', '#0182B0'))
+        super().__init__(tail_group)
+        self.r = 10
+        self.x = x
+        self.y = y
+        self.color = [0, 100, 255]
+
+    def update(self):
+        self.r -= 0.3
+        self.color[0] = min(255, self.color[0] + 20)
+        if self.r < 0:
+            self.kill()
 
 
 class Parc(pg.sprite.Sprite):
@@ -97,8 +105,8 @@ class Parc(pg.sprite.Sprite):
         self.x += self.vx
         self.y += self.vy
         self.vy += 2 * g
-        if self.y > 2000:
-            del self
+        if self.y > 1500:
+            self.kill()
 
 
 class Line():
