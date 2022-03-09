@@ -8,7 +8,7 @@ g = 0.5
 ball_radius = 20
 ball_color = '#D25EFF'
 ball_shadow ='#734884'
-bg_color = '#350044'
+bg_color = '#170526'
 line_color = '#5EFFFB'
 newline_color = '#2E7F7D'
 linebord_color = '#00C3CD'
@@ -26,7 +26,6 @@ def drawing(sc, ball, width, newxy, linepos, tail):
     dx = get_offset(ball.x, width)
     for el in tail_group: # drawing tail of ball
         pg.draw.circle(sc, tuple(el.color), (el.x + dx, el.y), el.r)
-
     #drawing parc
     for el in parc_group:
         pg.draw.rect(sc, el.color, (el.x - el.size + dx, el.y - el.size, el.size * 2, el.size * 2))
@@ -61,11 +60,7 @@ class Ball(pg.sprite.Sprite):
         self.direction = Vector2(0, -10)
 
     def update(self, linepos, sc):
-        # moving
-        self.direction.y += g
-        self.x += self.direction.x
-        self.y += self.direction.y
-
+        self.moving()
         # collision
 
         if linepos != (None, None):
@@ -73,8 +68,25 @@ class Ball(pg.sprite.Sprite):
             if rect.clipline(linepos):
                 line_norm = Vector2(-linepos[1][1] + linepos[0][1], linepos[1][0] - linepos[0][0])
                 self.direction = self.direction.reflect(line_norm)
-                self.direction *= 1.01
-                draw_parc(self.x, self.y, sc)
+                # creat parciples
+                for i in range(30):
+                    Parc(self.x, self.y, 'p')
+
+
+            # bug fix
+            while rect.clipline(linepos):
+                self.moving()
+                rect = pg.Rect(self.x - ball_radius, self.y - ball_radius, 2 * ball_radius, 2 * ball_radius)
+
+    def moving(self):
+        # moving
+        self.x += self.direction.x
+        self.y += self.direction.y
+        self.direction.y += g
+        Tailparticle(int(self.x), int(self.y))
+        Tailparticle(int(self.x - self.direction.x / 2), int(self.y - self.direction.y / 2))
+
+
 
 
 class Tailparticle(pg.sprite.Sprite):
@@ -93,9 +105,12 @@ class Tailparticle(pg.sprite.Sprite):
 
 
 class Parc(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, color):
         super().__init__(parc_group)
-        self.color = random.choice(('#E25EFF', '#7D00C5', '#C200C5'))
+        if color == 'p':
+            self.color = random.choice(('#E25EFF', '#7D00C5', '#C200C5'))
+        else:
+            self.color = random.choice((line_color, linebord_color))
         self.x, self.y = x, y
         self.vx = random.randint(-10, 10)
         self.vy = random.randint(-10, -1)
