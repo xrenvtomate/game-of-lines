@@ -7,6 +7,7 @@ tail = []
 clock = pg.time.Clock()
 sc = pg.display.set_mode((WIDTH, HEIGHT))
 
+max_v = (2 * g * HEIGHT) ** 0.5
 newxy = None
 ball = Ball()
 line = Line(None, None)
@@ -20,6 +21,10 @@ while running:
                 newxy = offseted(-get_offset(ball.x, WIDTH), event.pos)
             else:
                 line = Line(newxy, offseted(-get_offset(ball.x, WIDTH), event.pos))
+                for _ in range(10):
+                    Parc(*newxy, 'b')
+                for _ in range(10):
+                    Parc(*offseted(-get_offset(ball.x, WIDTH), event.pos), 'b')
                 newxy = None
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
@@ -32,13 +37,12 @@ while running:
                 line = Line(None, None)
 
 
+
+
     ball.update(line.cord, sc)
 
-
+    tail_group.update()
     parc_group.update()
-    tail.append(Tailparticle(int(ball.x), int(ball.y)))
-    if len(tail) > 180:
-        tail = tail[1:]
     sc.fill(bg_color)
     drawing(sc, ball, WIDTH, newxy, line.cord, tail)
     if ball.y > HEIGHT + 50:
